@@ -992,11 +992,11 @@ async def capture_page_screenshot_ultra_robust(page, url: str, topic: str) -> Op
         
         print(f"📏 Page dimensions with 67% zoom: {page_width}x{page_height}, viewport: {viewport_height}")
         
-        # ENHANCED: Calculate central area cropping (like your second image)
+        # ENHANCED: Calculate central area cropping (adjusted for better left-right balance)
         # Based on 1200px viewport width, crop consistently from edges
-        crop_left = 150      # Crop from left edge  
+        crop_left = 100      # REDUCED: Crop less from left edge  
         crop_top = 100       # Crop from top edge
-        crop_right = 250     # Crop from right edge (sidebar, ads, etc.)
+        crop_right = 300     # INCREASED: Crop more from right edge (sidebar, ads, etc.)
         
         # Calculate screenshot dimensions for central MCQ area
         screenshot_x = crop_left
