@@ -973,8 +973,8 @@ async def capture_page_screenshot_ultra_robust(page, url: str, topic: str) -> Op
             # Answer section - where correct answer is shown
             ('div[class*="answer"], .answer-section, .correct-answer, h2:contains("Answer")', 'answer_section'),
             
-            # CRITICAL: Detailed solution section with Key Points
-            ('div[class*="detailed-solution"], div[class*="solution"], .solution-section, h2:contains("Detailed Solution"), .key-points, div[class*="key-point"]', 'detailed_solution'),
+            # CRITICAL: Detailed solution section with Key Points - improved selectors for complete coverage
+            ('div[class*="detailed-solution"], div[class*="solution"], .solution-section, h2:contains("Detailed Solution"), .key-points, div[class*="key-point"], p:contains("Hence"), p:contains("Therefore"), div:contains("Detailed Solution")', 'detailed_solution'),
             
             # Exam/Paper info
             ('div.pyp-heading, .exam-info, .paper-info', 'exam_info'),
@@ -985,7 +985,7 @@ async def capture_page_screenshot_ultra_robust(page, url: str, topic: str) -> Op
         
         valid_elements = []
         
-        # ENHANCED element detection with comprehensive solution capture
+        # ENHANCED element detection with comprehensive solution capture including textual elements
         for selector, element_type in priority_selectors:
             try:
                 if element_type == 'options':
@@ -996,13 +996,31 @@ async def capture_page_screenshot_ultra_robust(page, url: str, topic: str) -> Op
                         print(f"✅ Found {len(elements)} options")
                 elif element_type in ['question', 'answer_section', 'detailed_solution', 'explanation']:
                     # Try multiple selectors for better coverage
+                    found_element = False
                     for single_selector in selector.split(', '):
                         element = await page.query_selector(single_selector.strip())
                         if element:
                             valid_elements.append(element)
                             mcq_elements[element_type] = element
                             print(f"✅ Found {element_type} element with selector: {single_selector.strip()}")
+                            found_element = True
                             break  # Found one, move to next type
+                    
+                    # ADDITIONAL: If detailed_solution not found with selectors, try finding by text content
+                    if not found_element and element_type == 'detailed_solution':
+                        try:
+                            # Look for text elements that contain solution keywords
+                            solution_text_elements = await page.query_selector_all('p, div, span')
+                            for text_element in solution_text_elements:
+                                text_content = await text_element.inner_text()
+                                if any(keyword in text_content.lower() for keyword in ['hence', 'therefore', 'similarly', 'correct', 'study of']):
+                                    valid_elements.append(text_element)
+                                    mcq_elements[element_type] = text_element
+                                    print(f"✅ Found {element_type} element by text content analysis")
+                                    break
+                        except Exception as text_e:
+                            print(f"⚠️ Error in text content analysis: {text_e}")
+                            
                 else:
                     element = await page.query_selector(selector)
                     if element:
@@ -1036,16 +1054,20 @@ async def capture_page_screenshot_ultra_robust(page, url: str, topic: str) -> Op
         else:
             print(f"✅ COMPLETE MCQ with detailed solution content found!")
         
-        # Enhanced scroll to capture maximum content
-        # Scroll to top first to ensure we capture everything
+        # Enhanced scroll to capture maximum content including detailed solution at bottom
+        # First scroll to top to ensure we start fresh
         await page.evaluate("window.scrollTo(0, 0)")
-        await page.wait_for_timeout(500)
+        await page.wait_for_timeout(300)
         
-        # Then scroll to see the bottom solution content
+        # Then scroll down slowly to load any lazy-loaded content in detailed solution
+        await page.evaluate("window.scrollTo(0, document.body.scrollHeight * 0.3)")
+        await page.wait_for_timeout(300)
+        await page.evaluate("window.scrollTo(0, document.body.scrollHeight * 0.6)")
+        await page.wait_for_timeout(300)
         await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-        await page.wait_for_timeout(500)
+        await page.wait_for_timeout(400)
         
-        # Set optimal position for screenshot
+        # Finally scroll back to optimal position for screenshot
         await page.evaluate("window.scrollTo(0, 0)")
         await page.wait_for_timeout(300)
         
@@ -1076,18 +1098,20 @@ async def capture_page_screenshot_ultra_robust(page, url: str, topic: str) -> Op
         content_width = max_x - min_x
         content_height = max_y - min_y
         
-        # ENHANCED margins for complete solution coverage - improved precision for better cropping
-        horizontal_margin = min(60, content_width * 0.08)   # Reduced to 8% or max 60px for tighter crop
-        vertical_margin = min(80, content_height * 0.10)   # Reduced to 10% or max 80px for better focus
+        # ENHANCED margins for complete solution coverage - extended downwards for full detailed solution
+        horizontal_margin = min(60, content_width * 0.08)   # Keep same width - 8% or max 60px for tighter crop
+        vertical_margin = min(120, content_height * 0.15)   # INCREASED to 15% or max 120px for more downward content
         
-        # Final optimized screenshot region for COMPLETE MCQ including detailed solution  
+        # Final optimized screenshot region for COMPLETE MCQ including detailed solution with extended bottom area
         screenshot_x = max(0, int(min_x - horizontal_margin))
         screenshot_y = max(0, int(min_y - vertical_margin))
         screenshot_width = min(1200, int(max_x - screenshot_x + horizontal_margin))
-        screenshot_height = int(max_y - screenshot_y + vertical_margin)
+        # ENHANCED: Add extra bottom padding to capture more detailed solution content
+        extra_bottom_padding = 150  # Additional pixels to capture more solution content below detected elements
+        screenshot_height = int(max_y - screenshot_y + vertical_margin + extra_bottom_padding)
         
-        # ENHANCED screenshot dimensions for complete detailed solution capture
-        max_screenshot_height = 4000  # Reduced from 6000 for better proportions
+        # ENHANCED screenshot dimensions for complete detailed solution capture - increased height limit
+        max_screenshot_height = 5000  # INCREASED from 4000 to 5000 for more detailed solution content
         if screenshot_height > max_screenshot_height:
             print(f"⚠️ Screenshot height {screenshot_height}px exceeds maximum, capping at {max_screenshot_height}px")
             screenshot_height = max_screenshot_height
