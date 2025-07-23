@@ -957,8 +957,8 @@ async def capture_page_screenshot_ultra_robust(page, url: str, topic: str) -> Op
         # Minimal wait for page settling
         await page.wait_for_timeout(800)
         
-        # Optimized viewport for MCQ content
-        await page.set_viewport_size({"width": 1280, "height": 720})
+        # Optimized viewport for MCQ content (improved for better screenshot dimensions)
+        await page.set_viewport_size({"width": 1200, "height": 800})
         await page.wait_for_timeout(200)
         
         # ENHANCED MCQ element detection - comprehensive selectors for complete solution coverage
@@ -1076,18 +1076,18 @@ async def capture_page_screenshot_ultra_robust(page, url: str, topic: str) -> Op
         content_width = max_x - min_x
         content_height = max_y - min_y
         
-        # ENHANCED margins for complete solution coverage - larger margins to ensure nothing is cut
-        horizontal_margin = min(80, content_width * 0.12)   # Increased to 12% or max 80px
-        vertical_margin = min(100, content_height * 0.15)   # Increased to 15% or max 100px
+        # ENHANCED margins for complete solution coverage - improved precision for better cropping
+        horizontal_margin = min(60, content_width * 0.08)   # Reduced to 8% or max 60px for tighter crop
+        vertical_margin = min(80, content_height * 0.10)   # Reduced to 10% or max 80px for better focus
         
         # Final optimized screenshot region for COMPLETE MCQ including detailed solution  
         screenshot_x = max(0, int(min_x - horizontal_margin))
         screenshot_y = max(0, int(min_y - vertical_margin))
-        screenshot_width = min(1280, int(max_x - screenshot_x + horizontal_margin))
+        screenshot_width = min(1200, int(max_x - screenshot_x + horizontal_margin))
         screenshot_height = int(max_y - screenshot_y + vertical_margin)
         
         # ENHANCED screenshot dimensions for complete detailed solution capture
-        max_screenshot_height = 6000  # Increased height to capture complete detailed solutions
+        max_screenshot_height = 4000  # Reduced from 6000 for better proportions
         if screenshot_height > max_screenshot_height:
             print(f"⚠️ Screenshot height {screenshot_height}px exceeds maximum, capping at {max_screenshot_height}px")
             screenshot_height = max_screenshot_height
@@ -1779,8 +1779,14 @@ def generate_pdf(mcqs: List[MCQData], topic: str, job_id: str, relevant_mcqs: in
             story.append(Paragraph(f"🎯 QUESTION {i} OF {len(mcqs)} 🎯", question_header_style))
             story.append(Spacer(1, 0.15*inch))
             
-            # Exam source with beautiful styling
-            exam_info = mcq.exam_info or f"{topic} Practice Question"
+            # Exam source with beautiful styling - FIXED: Use correct MCQData attributes
+            exam_info = ""
+            if mcq.exam_source_heading:
+                exam_info = mcq.exam_source_heading
+            elif mcq.exam_source_title:
+                exam_info = mcq.exam_source_title
+            else:
+                exam_info = f"{topic} Practice Question"
             story.append(Paragraph(f"📋 <i>{exam_info}</i>", 
                 ParagraphStyle('ExamInfo', parent=styles['Normal'], 
                     fontSize=11, textColor=secondary_color, alignment=TA_CENTER, 
