@@ -957,8 +957,8 @@ async def capture_page_screenshot_ultra_robust(page, url: str, topic: str) -> Op
         # Wait for page settling
         await page.wait_for_timeout(800)
         
-        # Set viewport for optimal MCQ content display
-        await page.set_viewport_size({"width": 1200, "height": 800})
+        # Set viewport for optimal MCQ content display with high resolution
+        await page.set_viewport_size({"width": 1920, "height": 1080})  # ENHANCED: Higher resolution for crystal clear quality
         await page.wait_for_timeout(200)
         
         # CRITICAL: Set page zoom to 67% as requested
@@ -992,25 +992,25 @@ async def capture_page_screenshot_ultra_robust(page, url: str, topic: str) -> Op
         
         print(f"📏 Page dimensions with 67% zoom: {page_width}x{page_height}, viewport: {viewport_height}")
         
-        # ENHANCED: Calculate central area cropping (adjusted for better left-right balance)
-        # Based on 1200px viewport width, crop consistently from edges
-        crop_left = 100      # REDUCED: Crop less from left edge  
-        crop_top = 100       # Crop from top edge
-        crop_right = 300     # INCREASED: Crop more from right edge (sidebar, ads, etc.)
+        # ENHANCED: Calculate central area cropping (optimized for perfect balance)
+        # Based on 1920px viewport width for high quality, crop consistently from edges
+        crop_left = 160      # Adjusted for 1920px viewport 
+        crop_top = 150       # Adjusted for 1080px viewport
+        crop_right = 560     # INCREASED: More cropping from right edge for 1920px
         
         # Calculate screenshot dimensions for central MCQ area
         screenshot_x = crop_left
         screenshot_y = crop_top  
         screenshot_width = 1200 - crop_left - crop_right  # Central content width
         
-        # ENHANCED: Calculate height to include question, options, AND answer section
+        # ENHANCED: Calculate height to include question, options, AND answer section with high quality
         # Based on typical MCQ layout, this should capture the essential content
-        base_height = 600    # Base height for question + options
-        answer_section_height = 200  # Additional height for answer section
+        base_height = 900    # INCREASED: Base height for question + options (higher resolution)
+        answer_section_height = 300  # INCREASED: Additional height for answer section
         screenshot_height = base_height + answer_section_height
         
-        # Ensure we don't exceed reasonable limits
-        max_height = 1000
+        # Ensure we don't exceed reasonable limits for high quality
+        max_height = 1500    # INCREASED: Higher limit for better quality
         if screenshot_height > max_height:
             screenshot_height = max_height
             
@@ -1027,14 +1027,16 @@ async def capture_page_screenshot_ultra_robust(page, url: str, topic: str) -> Op
         
         print(f"🎯 MCQ screenshot region (67% zoom): x={screenshot_x}, y={screenshot_y}, w={screenshot_width}, h={screenshot_height}")
         
-        # Capture the screenshot with the calculated region
+        # Capture the screenshot with maximum quality settings
         try:
             screenshot = await asyncio.wait_for(
                 page.screenshot(
                     clip=screenshot_region,
-                    type="png"
+                    type="png",
+                    omitBackground=False,  # ENHANCED: Include background for better quality
+                    quality=100            # ENHANCED: Maximum quality (though PNG ignores this, it's good practice)
                 ),
-                timeout=10.0
+                timeout=15.0  # INCREASED: More time for high quality capture
             )
             
             print(f"✅ MCQ screenshot captured with 67% zoom: {screenshot_width}x{screenshot_height}px")
