@@ -1770,7 +1770,7 @@ def generate_pdf(mcqs: List[MCQData], topic: str, job_id: str, relevant_mcqs: in
                 fontSize=16, alignment=TA_CENTER, textColor=gold_color,
                 fontName='Helvetica-Bold', spaceAfter=15)))
         
-        story.append(Paragraph(f"Generated with ❤️ by Ultra-Robust MCQ Scraper v3.0", 
+        story.append(Paragraph(f"Generated with ❤️ by HEMANT SINGH", 
             ParagraphStyle('CreditSubtext', parent=styles['Normal'], 
                 fontSize=14, alignment=TA_CENTER, textColor=accent_color,
                 fontName='Helvetica-Oblique')))
