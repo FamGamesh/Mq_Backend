@@ -1769,7 +1769,7 @@ def generate_pdf(mcqs: List[MCQData], topic: str, job_id: str, relevant_mcqs: in
                 fontSize=16, alignment=TA_CENTER, textColor=gold_color,
                 fontName='Helvetica-Bold', spaceAfter=15)))
         
-        story.append(Paragraph(f"Generated with ❤️ by Ultra-Robust MCQ Scraper v3.0", 
+        story.append(Paragraph(f"Generated with ❤️ by HEMANT SINGH", 
             ParagraphStyle('CreditSubtext', parent=styles['Normal'], 
                 fontSize=14, alignment=TA_CENTER, textColor=accent_color,
                 fontName='Helvetica-Oblique')))
@@ -1874,7 +1874,7 @@ def generate_image_based_pdf(screenshots_data: List[dict], topic: str, exam_type
         story.append(DecorativeSeparator(doc.width, 0.2*inch))
         story.append(Spacer(1, 0.3*inch))
         
-        story.append(Paragraph("🎓 PREMIUM MCQ COLLECTION", title_style))
+        story.append(Paragraph("🎓 <b>PREMIUM</b><br/><b>MCQ COLLECTION</b>", title_style))
         story.append(Spacer(1, 0.2*inch))
         
         story.append(Paragraph(f"📚 Subject: {topic.upper()}", subtitle_style))
@@ -1890,9 +1890,9 @@ def generate_image_based_pdf(screenshots_data: List[dict], topic: str, exam_type
             ['✅ Total Quality Questions', f'{len(screenshots_data)}'],
             ['🔍 Smart Filtering Applied', 'Ultra-Premium Topic-based'],
             ['📅 Generated On', f'{datetime.now().strftime("%B %d, %Y at %I:%M %p")}'],
-            ['🌐 Authoritative Source', 'Testbook.com (Premium Grade)'],
+            ['🌐 Authoritative Source', 'Testbook.com (Premium)'],
             ['🏆 Quality Assurance', 'Professional Excellence'],
-            ['⚡ Processing Method', 'Ultra-Robust AI Enhanced']
+            ['⚡ Processing Method', 'Ultra-AI Enhanced']
         ]
         
         stats_table = Table(stats_data, colWidths=[3*inch, 2.5*inch])
