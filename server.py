@@ -996,7 +996,7 @@ async def capture_page_screenshot_ultra_robust(page, url: str, topic: str) -> Op
         # Based on 1200px viewport width, crop consistently from edges  
         crop_left = 100      # Crop less from left edge  
         crop_top = 100       # Crop from top edge
-        crop_right = 350     # INCREASED: 50px more cropping from right edge
+        crop_right = 430     # INCREASED: 80px more cropping from right edge (increased padding)
         
         # Calculate screenshot dimensions for central MCQ area
         screenshot_x = crop_left
@@ -1206,7 +1206,7 @@ async def search_google_custom(topic: str, exam_type: str = "SSC") -> List[str]:
             raise e
         return []
 
-async def scrape_mcq_content_with_page_ultra_robust(page, url: str, search_topic: str) -> Optional[MCQData]:
+async def scrape_mcq_content_with_page_ultra_robust(page, url: str, search_topic: str, exam_type: str = "SSC") -> Optional[MCQData]:
     """Ultra-robust MCQ content scraping"""
     try:
         # Navigate with timeout
@@ -1245,7 +1245,7 @@ async def scrape_mcq_content_with_page_ultra_robust(page, url: str, search_topic
         
         # Check relevance
         if not is_mcq_relevant(question, search_topic):
-            print(f"тЭМ MCQ not relevant for topic '{search_topic}'")
+            print(f"❌ MCQ not relevant for topic '{search_topic}'")
             return None
         
         print(f"тЬЕ MCQ relevant - topic '{search_topic}' found in question body")
@@ -1292,7 +1292,8 @@ async def scrape_mcq_content_with_page_ultra_robust(page, url: str, search_topic
         
         # Return MCQ data
         if question and (options or answer):
-            return MCQData(
+            # Create MCQ data object
+            mcq_data = MCQData(
                 question=question.strip(),
                 options=options,
                 answer=answer.strip(),
@@ -1300,6 +1301,22 @@ async def scrape_mcq_content_with_page_ultra_robust(page, url: str, search_topic
                 exam_source_title=exam_source_title.strip(),
                 is_relevant=True
             )
+            
+            # Apply exam type filtering based on source information
+            if exam_type.upper() in ["SSC", "BPSC"]:
+                # Check if exam type tag appears in source heading, source title, or question
+                combined_text = f"{mcq_data.question} {mcq_data.exam_source_heading} {mcq_data.exam_source_title}".lower()
+                exam_type_lower = exam_type.lower()
+                
+                if exam_type_lower not in combined_text:
+                    print(f"❌ MCQ filtered out: No '{exam_type}' tag found in MCQ source information")
+                    print(f"   Source heading: '{mcq_data.exam_source_heading}'")
+                    print(f"   Source title: '{mcq_data.exam_source_title}'")
+                    return None
+                else:
+                    print(f"✅ MCQ passes exam type filter: '{exam_type}' tag found")
+            
+            return mcq_data
         
         return None
         
@@ -1307,7 +1324,7 @@ async def scrape_mcq_content_with_page_ultra_robust(page, url: str, search_topic
         print(f"тЭМ Error scraping {url}: {e}")
         return None
 
-async def scrape_mcq_content_ultra_robust(url: str, search_topic: str) -> Optional[MCQData]:
+async def scrape_mcq_content_ultra_robust(url: str, search_topic: str, exam_type: str = "SSC") -> Optional[MCQData]:
     """Ultra-robust MCQ scraping with maximum error handling"""
     context = None
     page = None
@@ -1340,7 +1357,7 @@ async def scrape_mcq_content_ultra_robust(url: str, search_topic: str) -> Option
                 continue
             
             # Scrape content
-            result = await scrape_mcq_content_with_page_ultra_robust(page, url, search_topic)
+            result = await scrape_mcq_content_with_page_ultra_robust(page, url, search_topic, exam_type)
             return result
             
         except Exception as e:
@@ -2008,7 +2025,7 @@ async def process_text_extraction_ultra_robust(job_id: str, topic: str, exam_typ
                               processed_links=i, mcqs_found=len(mcqs))
             
             try:
-                result = await scrape_mcq_content_ultra_robust(url, topic)
+                result = await scrape_mcq_content_ultra_robust(url, topic, exam_type)
                 
                 if result:
                     mcqs.append(result)
