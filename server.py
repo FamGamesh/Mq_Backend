@@ -1033,7 +1033,7 @@ async def capture_page_screenshot_ultra_robust(page, url: str, topic: str) -> Op
                 page.screenshot(
                     clip=screenshot_region,
                     type="png",
-                    omitBackground=False,  # ENHANCED: Include background for better quality
+                    omit_background=False,  # FIXED: Changed from omitBackground to omit_background
                     quality=100            # ENHANCED: Maximum quality (though PNG ignores this, it's good practice)
                 ),
                 timeout=15.0  # INCREASED: More time for high quality capture
@@ -1126,64 +1126,9 @@ async def scrape_testbook_page_with_screenshot_ultra_robust(context: BrowserCont
                 pass
 
 def is_mcq_relevant(question_text: str, search_topic: str) -> bool:
-    """Enhanced relevance checking"""
-    if not question_text or not search_topic:
-        return False
-    
-    question_lower = question_text.lower()
-    topic_lower = search_topic.lower()
-    
-    # Enhanced topic matching
-    topic_variations = [topic_lower]
-    
-    # Extended topic stems
-    topic_stems = {
-        'biology': ['biological', 'bio', 'organism', 'living', 'life', 'cell', 'plant', 'animal', 'species', 'photosynthesis', 'respiration', 'DNA', 'gene'],
-        'physics': ['physical', 'force', 'energy', 'motion', 'matter', 'quantum', 'wave', 'particle', 'newton', 'gravity', 'electricity', 'magnetism'],
-        'chemistry': ['chemical', 'reaction', 'compound', 'element', 'molecule', 'atom', 'bond', 'formula', 'water', 'oxygen', 'carbon', 'acid'],
-        'heart': ['cardiac', 'cardiovascular', 'circulation', 'blood', 'pulse', 'artery', 'vein', 'pressure', 'organ', 'pump'],
-        'mathematics': ['mathematical', 'math', 'equation', 'number', 'calculation', 'formula', 'solve', 'calculate', 'area', 'radius', 'circle', 'triangle'],
-        'history': ['historical', 'past', 'ancient', 'period', 'era', 'dynasty', 'empire', 'civilization', 'war', 'battle', 'year', 'century'],
-        'geography': ['geographical', 'location', 'place', 'region', 'area', 'continent', 'country', 'climate', 'capital', 'city', 'ocean', 'river', 'mountain'],
-        'economics': ['economic', 'economy', 'market', 'trade', 'finance', 'gdp', 'inflation', 'banking', 'money', 'currency', 'investment'],
-        'politics': ['political', 'government', 'policy', 'administration', 'governance', 'democracy', 'election', 'president', 'minister', 'parliament'],
-        'computer': ['computing', 'software', 'hardware', 'algorithm', 'programming', 'digital', 'binary', 'data', 'internet', 'technology'],
-        'science': ['scientific', 'research', 'theory', 'experiment', 'hypothesis', 'discovery', 'planet', 'solar', 'universe', 'nature'],
-        'english': ['grammar', 'vocabulary', 'literature', 'language', 'sentence', 'word', 'comprehension', 'reading', 'writing'],
-        'reasoning': ['logical', 'logic', 'puzzle', 'pattern', 'sequence', 'analogy', 'verbal', 'analytical', 'solve', 'problem'],
-        'cell': ['cellular', 'membrane', 'nucleus', 'mitosis', 'meiosis', 'organelle', 'cytoplasm', 'ribosome', 'mitochondria', 'chromosome'],
-        'mitosis': ['cell', 'division', 'chromosome', 'spindle', 'kinetochore', 'centromere', 'anaphase', 'metaphase', 'prophase', 'telophase'],
-        'excel': ['spreadsheet', 'microsoft', 'worksheet', 'formula', 'function', 'chart', 'pivot', 'vlookup', 'hlookup', 'macro']
-    }
-    
-    if topic_lower in topic_stems:
-        topic_variations.extend(topic_stems[topic_lower])
-    
-    # Add individual words
-    topic_words = topic_lower.split()
-    for word in topic_words:
-        if len(word) > 3:
-            topic_variations.append(word)
-    
-    # Add word stems
-    if len(topic_lower) > 4:
-        root_word = topic_lower
-        suffixes = ['ical', 'ing', 'ed', 'er', 'est', 'ly', 'tion', 'sion', 'ness', 'ment', 'ogy', 'ics']
-        for suffix in suffixes:
-            if root_word.endswith(suffix) and len(root_word) > len(suffix) + 2:
-                root_word = root_word[:-len(suffix)]
-                topic_variations.append(root_word)
-                break
-    
-    # Remove duplicates and sort
-    topic_variations = sorted(list(set(topic_variations)), key=len, reverse=True)
-    
-    # Check for matches
-    for variation in topic_variations:
-        if len(variation) > 2 and variation in question_lower:
-            return True
-    
-    return False
+    """Enhanced relevance checking using comprehensive keyword dictionary"""
+    from competitive_exam_keywords import enhanced_is_mcq_relevant
+    return enhanced_is_mcq_relevant(question_text, search_topic)
 
 async def search_google_custom(topic: str, exam_type: str = "SSC") -> List[str]:
     """Search Google Custom Search API with enhanced error handling"""
