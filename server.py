@@ -1634,7 +1634,7 @@ def generate_pdf(mcqs: List[MCQData], topic: str, job_id: str, relevant_mcqs: in
         story.append(DecorativeSeparator(doc.width, 0.2*inch))
         story.append(Spacer(1, 0.3*inch))
         
-        story.append(Paragraph("🎓 PREMIUM MCQ COLLECTION", title_style))
+        story.append(Paragraph("🎓 <b>PREMIUM</b><br/><b>MCQ COLLECTION</b>", title_style))
         story.append(Spacer(1, 0.2*inch))
         
         story.append(Paragraph(f"📚 Subject: {topic.upper()}", subtitle_style))
