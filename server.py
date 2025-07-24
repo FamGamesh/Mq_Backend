@@ -1033,8 +1033,8 @@ async def capture_page_screenshot_ultra_robust(page, url: str, topic: str) -> Op
                 page.screenshot(
                     clip=screenshot_region,
                     type="png",
-                    omit_background=False,  # FIXED: Changed from omitBackground to omit_background
-                    quality=100            # ENHANCED: Maximum quality (though PNG ignores this, it's good practice)
+                    omit_background=False  # FIXED: Changed from omitBackground to omit_background
+                    # NOTE: quality parameter removed as it's unsupported for PNG screenshots
                 ),
                 timeout=15.0  # INCREASED: More time for high quality capture
             )
