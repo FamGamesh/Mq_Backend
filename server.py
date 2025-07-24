@@ -1534,7 +1534,7 @@ def generate_pdf(mcqs: List[MCQData], topic: str, job_id: str, relevant_mcqs: in
         gold_color = HexColor('#d69e2e')         # Gold for accents
         
         # 📚 ENHANCED Typography Styles with Beautiful Design Elements
-title_style = ParagraphStyle(
+        title_style = ParagraphStyle(
             'CustomTitle',
             parent=styles['Heading1'],
             fontSize=36,
@@ -1546,8 +1546,7 @@ title_style = ParagraphStyle(
             borderColor=accent_color,
             borderPadding=20,
             backColor=light_color,
-            borderRadius=10,
-            leading=45
+            borderRadius=10
         )
         
         subtitle_style = ParagraphStyle(
@@ -1838,8 +1837,7 @@ def generate_image_based_pdf(screenshots_data: List[dict], topic: str, exam_type
             borderColor=accent_color,
             borderPadding=20,
             backColor=light_color,
-            borderRadius=10,
-            leading=45
+            borderRadius=10
         )
         
         subtitle_style = ParagraphStyle(
