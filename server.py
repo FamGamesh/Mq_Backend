@@ -1015,7 +1015,7 @@ async def capture_page_screenshot_ultra_robust(page, url: str, topic: str) -> Op
         # Based on 1200px viewport width, crop consistently from edges  
         crop_left = 100      # Crop less from left edge  
         crop_top = 100       # Crop from top edge
-        crop_right = 350     # INCREASED: 50px more cropping from right edge
+        crop_right = 430     # INCREASED: 80px more cropping from right edge (350 + 80)
         
         # Calculate screenshot dimensions for central MCQ area
         screenshot_x = crop_left
@@ -1025,11 +1025,11 @@ async def capture_page_screenshot_ultra_robust(page, url: str, topic: str) -> Op
         # ENHANCED: Calculate height to include question, options, AND answer section
         # Based on typical MCQ layout, this should capture the essential content
         base_height = 600    # Base height for question + options (working resolution)
-        answer_section_height = 400  # INCREASED by 200px: Additional height for answer section (was 200, now 400)
+        answer_section_height = 600  # INCREASED by 200px MORE: Additional height for answer section (was 400, now 600)
         screenshot_height = base_height + answer_section_height
         
         # Ensure we don't exceed reasonable limits
-        max_height = 1200    # INCREASED: Allow for extra 200px bottom padding (was 1000, now 1200)
+        max_height = 1400    # INCREASED: Allow for extra 200px MORE bottom padding (was 1200, now 1400)
         if screenshot_height > max_height:
             screenshot_height = max_height
             
@@ -1791,7 +1791,7 @@ def generate_image_based_pdf(screenshots_data: List[dict], topic: str, exam_type
     """Generate BEAUTIFUL PROFESSIONAL image-based PDF with enhanced design, graphics, and premium styling"""
     try:
         from reportlab.lib.pagesizes import letter, A4
-        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, PageBreak
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, PageBreak, Table, TableStyle
         from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
         from reportlab.lib.units import inch
         from reportlab.lib.enums import TA_CENTER, TA_LEFT
@@ -1806,141 +1806,237 @@ def generate_image_based_pdf(screenshots_data: List[dict], topic: str, exam_type
         filepath = pdf_dir / filename
         
         doc = SimpleDocTemplate(str(filepath), pagesize=A4,
-                              topMargin=0.5*inch, bottomMargin=0.5*inch,
-                              leftMargin=0.5*inch, rightMargin=0.5*inch)
+                              topMargin=0.6*inch, bottomMargin=0.6*inch,
+                              leftMargin=0.6*inch, rightMargin=0.6*inch)
+        story = []
         
         styles = getSampleStyleSheet()
         
-        # Color palette
-        primary_color = HexColor('#1a365d')
-        accent_color = HexColor('#38b2ac')
-        secondary_color = HexColor('#2b6cb0')
-        light_color = HexColor('#f7fafc')
-        gold_color = HexColor('#d69e2e')
+        # 🎨 PREMIUM Color Palette - Professional & Eye-catching
+        primary_color = HexColor('#1a365d')      # Deep Navy Blue
+        secondary_color = HexColor('#2b6cb0')    # Medium Blue  
+        accent_color = HexColor('#38b2ac')       # Teal
+        success_color = HexColor('#48bb78')      # Green
+        warning_color = HexColor('#ed8936')      # Orange
+        text_color = HexColor('#2d3748')         # Dark Gray
+        light_color = HexColor('#f7fafc')        # Very Light Blue
+        gradient_start = HexColor('#667eea')     # Purple-Blue
+        gradient_end = HexColor('#764ba2')       # Purple
+        gold_color = HexColor('#d69e2e')         # Gold for accents
         
-        # Enhanced styles
+        # 📚 ENHANCED Typography Styles with Beautiful Design Elements
         title_style = ParagraphStyle(
-            'ImageTitle',
+            'CustomTitle',
             parent=styles['Heading1'],
-            fontSize=28,
-            spaceAfter=20,
+            fontSize=36,
+            spaceAfter=35,
             alignment=TA_CENTER,
             textColor=primary_color,
-            fontName='Helvetica-Bold'
+            fontName='Helvetica-Bold',
+            borderWidth=3,
+            borderColor=accent_color,
+            borderPadding=20,
+            backColor=light_color,
+            borderRadius=10
         )
         
         subtitle_style = ParagraphStyle(
-            'ImageSubtitle',
+            'CustomSubtitle',
             parent=styles['Normal'],
-            fontSize=16,
-            spaceAfter=25,
+            fontSize=18,
+            spaceAfter=30,
             alignment=TA_CENTER,
             textColor=secondary_color,
-            fontName='Helvetica-Bold'
-        )
-        
-        mcq_header_style = ParagraphStyle(
-            'MCQHeader',
-            parent=styles['Normal'],
-            fontSize=14,
-            spaceAfter=10,
-            alignment=TA_CENTER,
-            textColor=white,
             fontName='Helvetica-Bold',
-            backColor=accent_color,
-            borderPadding=8
+            borderWidth=2,
+            borderColor=gold_color,
+            borderPadding=12,
+            backColor=white,
+            borderRadius=5
         )
         
-        story = []
+        question_header_style = ParagraphStyle(
+            'QuestionHeaderStyle',
+            parent=styles['Normal'],
+            fontSize=18,
+            spaceAfter=20,
+            fontName='Helvetica-Bold',
+            textColor=white,
+            borderWidth=3,
+            borderColor=primary_color,
+            borderPadding=15,
+            backColor=gradient_start,
+            alignment=TA_CENTER,
+            borderRadius=12
+        )
         
-        # Cover page
-        story.append(Spacer(1, 1*inch))
-        story.append(Paragraph("🎓 PREMIUM MCQ SCREENSHOT COLLECTION", title_style))
+        # 📋 STUNNING COVER PAGE with Graphics
+        story.append(DecorativeSeparator(doc.width, 0.2*inch))
         story.append(Spacer(1, 0.3*inch))
+        
+        story.append(Paragraph("🎓 PREMIUM MCQ COLLECTION", title_style))
+        story.append(Spacer(1, 0.2*inch))
+        
         story.append(Paragraph(f"📚 Subject: {topic.upper()}", subtitle_style))
-        story.append(Paragraph(f"🎯 Exam Type: {exam_type.upper()}", subtitle_style))
-        story.append(Spacer(1, 0.5*inch))
+        story.append(Spacer(1, 0.3*inch))
         
-        # Statistics
-        stats_text = f"""
-        📊 <b>Collection Statistics:</b><br/>
-        • Total Screenshots: {len(screenshots_data)}<br/>
-        • Topic: {topic}<br/>
-        • Exam Type: {exam_type}<br/>
-        • Generated: {datetime.now().strftime("%B %d, %Y at %I:%M %p")}<br/>
-        • Source: Testbook.com (Premium Quality)
-        """
+        story.append(DecorativeSeparator(doc.width, 0.15*inch))
+        story.append(Spacer(1, 0.4*inch))
         
-        story.append(Paragraph(stats_text, 
-            ParagraphStyle('Stats', parent=styles['Normal'], 
-                fontSize=12, textColor=primary_color, 
-                borderWidth=2, borderColor=accent_color, 
-                borderPadding=15, backColor=light_color)))
+        # PREMIUM ENHANCED STATISTICS TABLE DESIGN
+        stats_data = [
+            ['📊 COLLECTION ANALYTICS', ''],
+            ['🎯 Search Topic', f'{topic}'],
+            ['✅ Total Quality Questions', f'{len(screenshots_data)}'],
+            ['🔍 Smart Filtering Applied', 'Ultra-Premium Topic-based'],
+            ['📅 Generated On', f'{datetime.now().strftime("%B %d, %Y at %I:%M %p")}'],
+            ['🌐 Authoritative Source', 'Testbook.com (Premium Grade)'],
+            ['🏆 Quality Assurance', 'Professional Excellence'],
+            ['⚡ Processing Method', 'Ultra-Robust AI Enhanced']
+        ]
         
+        stats_table = Table(stats_data, colWidths=[3*inch, 2.5*inch])
+        
+        # Enhanced premium table styling with alternating rows and beautiful borders
+        stats_table_style = [
+            # Header styling with gradient-like effect
+            ('BACKGROUND', (0, 0), (-1, 0), primary_color),
+            ('TEXTCOLOR', (0, 0), (-1, 0), white),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),  # Changed from CENTER to LEFT for better readability
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 14),  # Increased font size
+            ('LEFTPADDING', (0, 0), (-1, -1), 15),  # Enhanced padding
+            ('RIGHTPADDING', (0, 0), (-1, -1), 15),
+            ('TOPPADDING', (0, 0), (-1, 0), 15),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 15),
+            
+            # Enhanced data rows with alternating backgrounds
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, -1), 12),  # Increased font size for better readability
+            ('TOPPADDING', (0, 1), (-1, -1), 12),  # Enhanced padding
+            ('BOTTOMPADDING', (0, 1), (-1, -1), 12),
+            
+            # Alternating row colors for better visual separation
+            ('BACKGROUND', (0, 1), (-1, 1), light_color),
+            ('BACKGROUND', (0, 2), (-1, 2), white),
+            ('BACKGROUND', (0, 3), (-1, 3), light_color),
+            ('BACKGROUND', (0, 4), (-1, 4), white),
+            ('BACKGROUND', (0, 5), (-1, 5), light_color),
+            ('BACKGROUND', (0, 6), (-1, 6), white),
+            ('BACKGROUND', (0, 7), (-1, 7), light_color),
+            ('BACKGROUND', (0, 8), (-1, 8), white),
+            
+            # Beautiful border styling with accent colors
+            ('GRID', (0, 0), (-1, -1), 2, accent_color),  # Enhanced border width
+            ('LINEBELOW', (0, 0), (-1, 0), 3, secondary_color),  # Thicker header underline
+            ('LINEBEFORE', (0, 0), (0, -1), 3, accent_color),  # Left accent border
+            ('LINEAFTER', (-1, 0), (-1, -1), 3, accent_color),  # Right accent border
+            
+            # Enhanced vertical alignment and spacing
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            
+            # Subtle text colors for better readability
+            ('TEXTCOLOR', (0, 1), (-1, -1), text_color),
+            ('TEXTCOLOR', (1, 1), (-1, -1), primary_color),  # Values in primary color for emphasis
+        ]
+        
+        stats_table.setStyle(TableStyle(stats_table_style))
+        
+        story.append(stats_table)
+        story.append(Spacer(1, 0.4*inch))
+        
+        # Replace simple separator with premium DecorativeSeparator
+        story.append(DecorativeSeparator(doc.width, 0.15*inch))
         story.append(PageBreak())
         
-        # MCQ Screenshots
+        # 📝 ENHANCED MCQ CONTENT with Beautiful Styling
         for i, screenshot_item in enumerate(screenshots_data, 1):
-            # MCQ header
-            story.append(Paragraph(f"📸 SCREENSHOT {i} OF {len(screenshots_data)}", mcq_header_style))
+            # Professional Question header with graphics
+            story.append(Paragraph(f"🎯 QUESTION {i} OF {len(screenshots_data)} 🎯", question_header_style))
+            story.append(Spacer(1, 0.15*inch))
+            
+            # Source URL with beautiful styling
+            url_style = ParagraphStyle(
+                'URL',
+                parent=styles['Normal'],
+                fontSize=10,
+                textColor=accent_color,
+                alignment=TA_CENTER,
+                fontName='Helvetica-Oblique',
+                borderWidth=1,
+                borderColor=accent_color,
+                borderPadding=8,
+                backColor=light_color,
+                borderRadius=5
+            )
+            story.append(Paragraph(f"🌐 Source: {screenshot_item['url']}", url_style))
             story.append(Spacer(1, 0.2*inch))
             
-            # URL info
-            url_text = f"🌐 Source: {screenshot_item.get('url', 'Unknown')}"
-            story.append(Paragraph(url_text, 
-                ParagraphStyle('URLInfo', parent=styles['Normal'], 
-                    fontSize=9, textColor=secondary_color, 
-                    fontName='Helvetica-Oblique', spaceAfter=10)))
+            # Convert and process screenshot
+            screenshot_pil = PILImage.open(io.BytesIO(screenshot_item['screenshot']))
             
-            # Screenshot image
-            try:
-                screenshot_bytes = screenshot_item.get('screenshot')
-                if screenshot_bytes:
-                    # Convert bytes to PIL Image
-                    img_stream = io.BytesIO(screenshot_bytes)
-                    pil_img = PILImage.open(img_stream)
-                    
-                    # Calculate dimensions to fit page width while maintaining aspect ratio
-                    page_width = doc.width
-                    img_width, img_height = pil_img.size
-                    
-                    # Scale to fit page width with some margin
-                    max_width = page_width - 0.5*inch
-                    scale_factor = max_width / img_width
-                    
-                    scaled_width = img_width * scale_factor
-                    scaled_height = img_height * scale_factor
-                    
-                    # Limit height to reasonable size
-                    max_height = 8*inch
-                    if scaled_height > max_height:
-                        scale_factor = max_height / img_height
-                        scaled_width = img_width * scale_factor
-                        scaled_height = img_height * scale_factor
-                    
-                    # Create ReportLab Image
-                    img_stream.seek(0)  # Reset stream position
-                    rl_img = Image(img_stream, width=scaled_width, height=scaled_height)
-                    story.append(rl_img)
-                    
-            except Exception as e:
-                print(f"⚠️ Error adding screenshot {i}: {e}")
-                story.append(Paragraph(f"❌ Error loading screenshot {i}", 
-                    ParagraphStyle('Error', parent=styles['Normal'], 
-                        fontSize=12, textColor=HexColor('#e53e3e'))))
+            img_buffer = io.BytesIO()
+            screenshot_pil.save(img_buffer, format='PNG')
+            img_buffer.seek(0)
             
-            # Add page break between screenshots (except for the last one)
+            # Calculate enhanced dimensions for better display
+            page_width = A4[0] - 1.2*inch
+            page_height = A4[1] - 3*inch
+            
+            img_width, img_height = screenshot_pil.size
+            aspect_ratio = img_width / img_height
+            
+            if aspect_ratio > 1:  # Landscape
+                display_width = min(page_width, 7*inch)
+                display_height = display_width / aspect_ratio
+            else:  # Portrait
+                display_height = min(page_height, 9*inch)
+                display_width = display_height * aspect_ratio
+            
+            # Add enhanced image with border styling
+            img = Image(img_buffer, width=display_width, height=display_height)
+            story.append(img)
+            story.append(Spacer(1, 0.3*inch))
+            
+            # Beautiful separator between questions
+            story.append(DecorativeSeparator(doc.width, 0.1*inch))
+            story.append(Spacer(1, 0.2*inch))
+            
             if i < len(screenshots_data):
                 story.append(PageBreak())
         
-        # Footer
-        story.append(Spacer(1, 0.5*inch))
-        story.append(Paragraph("⭐ Screenshot Collection Complete ⭐", 
-            ParagraphStyle('Footer', parent=styles['Normal'], 
-                fontSize=14, alignment=TA_CENTER, textColor=gold_color,
-                fontName='Helvetica-Bold')))
+        # 🌟 BEAUTIFUL CREDIT PAGE - "Made By HEMANT SINGH"
+        story.append(PageBreak())
+        story.append(Spacer(1, 2*inch))
         
-        story.append(Paragraph(f"Generated with ❤️ by Ultra-Robust MCQ Scraper v3.0", 
+        # Credit page with stunning design
+        credit_style = ParagraphStyle(
+            'CreditStyle',
+            parent=styles['Normal'],
+            fontSize=28,
+            alignment=TA_CENTER,
+            textColor=primary_color,
+            fontName='Helvetica-Bold',
+            borderWidth=4,
+            borderColor=gold_color,
+            borderPadding=25,
+            backColor=light_color,
+            borderRadius=15,
+            spaceAfter=20
+        )
+        
+        story.append(DecorativeSeparator(doc.width, 0.2*inch))
+        story.append(Spacer(1, 0.5*inch))
+        
+        story.append(Paragraph("✨ CREATED BY ✨", 
+            ParagraphStyle('CreditHeader', parent=styles['Normal'], 
+                fontSize=18, alignment=TA_CENTER, textColor=secondary_color,
+                fontName='Helvetica-Bold', spaceAfter=20)))
+        
+        story.append(Paragraph("🎯 HEMANT SINGH 🎯", credit_style))
+        
+        story.append(Spacer(1, 0.3*inch))
+        story.append(Paragraph("Premium MCQ Collection Designer", 
             ParagraphStyle('CreditSubtext', parent=styles['Normal'], 
                 fontSize=14, alignment=TA_CENTER, textColor=accent_color,
                 fontName='Helvetica-Oblique')))
