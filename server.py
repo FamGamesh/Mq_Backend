@@ -1650,9 +1650,9 @@ def generate_pdf(mcqs: List[MCQData], topic: str, job_id: str, relevant_mcqs: in
             ['✅ Total Quality Questions', f'{len(mcqs)}'],
             ['🔍 Smart Filtering Applied', 'Ultra-Premium Topic-based'],
             ['📅 Generated On', f'{datetime.now().strftime("%B %d, %Y at %I:%M %p")}'],
-            ['🌐 Authoritative Source', 'Testbook.com (Premium Grade)'],
+            ['🌐 Authoritative Source', 'Testbook.com (Premium)'],
             ['🏆 Quality Assurance', 'Professional Excellence'],
-            ['⚡ Processing Method', 'Ultra-Robust AI Enhanced']
+            ['⚡ Processing Method', 'Ultra-AI Enhanced']
         ]
         
         stats_table = Table(stats_data, colWidths=[3*inch, 2.5*inch])
