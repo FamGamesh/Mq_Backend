@@ -1051,7 +1051,7 @@ async def capture_page_screenshot_ultra_robust(page, url: str, topic: str) -> Op
         print(f"❌ Error capturing screenshot for {url}: {str(e)}")
         return None
 
-async def scrape_testbook_page_with_screenshot_ultra_robust(context: BrowserContext, url: str, topic: str, exam_type: str = "SSC") -> Optional[dict]:
+async def scrape_testbook_page_with_screenshot_ultra_robust(context: BrowserContext, url: str, topic: str) -> Optional[dict]:
     """
     Optimized screenshot scraping with faster processing and smart element detection
     ENHANCED: Added exam type filtering for screenshot-based scraping (SSC/BPSC)
@@ -1119,21 +1119,7 @@ async def scrape_testbook_page_with_screenshot_ultra_robust(context: BrowserCont
             print(f"❌ MCQ not relevant for topic '{topic}' on {url}")
             return None
         
-        # ENHANCED: Apply exam type filtering for screenshot-based scraping (same logic as text-based)
-        if exam_type.upper() in ["SSC", "BPSC"]:
-            # Check if exam type tag appears in source heading, source title, or question
-            combined_text = f"{question_text} {exam_source_heading} {exam_source_title}".lower()
-            exam_type_lower = exam_type.lower()
-            
-            if exam_type_lower not in combined_text:
-                print(f"❌ Screenshot MCQ filtered out: No '{exam_type}' tag found in MCQ source information")
-                print(f"   Source heading: '{exam_source_heading}'")
-                print(f"   Source title: '{exam_source_title}'")
-                return None
-            else:
-                print(f"✅ Screenshot MCQ passes exam type filter: '{exam_type}' tag found")
-        
-        print(f"✅ MCQ relevant for topic '{topic}' and exam type '{exam_type}'")
+        print(f"✅ MCQ relevant for topic '{topic}'")
         
         # Optimized screenshot capture
         screenshot = await capture_page_screenshot_ultra_robust(page, url, topic)
@@ -1146,7 +1132,6 @@ async def scrape_testbook_page_with_screenshot_ultra_robust(context: BrowserCont
             "url": url,
             "screenshot": screenshot,
             "is_relevant": True,
-            "exam_type": exam_type,
             "source_heading": exam_source_heading,
             "source_title": exam_source_title
         }
